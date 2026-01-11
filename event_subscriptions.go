@@ -195,3 +195,28 @@ func (c *Client) EventChannelAdBreakBegin(ctx context.Context, sessionID string,
 	}
 	return &resp, nil
 }
+
+// ConditionEventChannelSubscriptionGift represents the condition for a gift subscription event.
+type ConditionEventChannelSubscriptionGift struct {
+	// BroadcasterUserID is the ID of the broadcaster to monitor.
+	BroadcasterUserID string `json:"broadcaster_user_id"`
+}
+
+// EventChannelSubscriptionGift subscribes to channel point reward redemption events.
+func (c *Client) EventChannelSubscriptionGift(ctx context.Context, sessionID string, condition ConditionEventChannelSubscriptionGift) (*any, error) {
+	req := EventRequest{
+		Type:      "channel.subscription.gift",
+		Version:   "1",
+		Conditoin: condition,
+		Transport: WebsocketTransport{
+			Method:    "websocket",
+			SessionID: sessionID,
+		},
+	}
+	var resp any
+	err := c.doRequest(ctx, "POST", "eventsub/subscriptions", req, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
