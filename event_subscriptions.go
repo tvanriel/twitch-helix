@@ -41,11 +41,38 @@ type WebsocketTransport struct {
 
 // =============================================================
 
+func (c *Client) ChannelChatMessage(ctx context.Context, sessionID string, condition ConditionChannelChatMessage) (*any, error) {
+	req := EventRequest{
+		Type: "channel.chat.message",
+		Version: "1",
+		Conditoin: c,
+		Transport: WebsocketTransport{
+			Method:    "websocket",
+			SessionID: sessionID,
+		},
+	}	
+	var resp any
+	err := c.doRequest(ctx, "POST", "eventsub/subscriptions", req, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+
+}
+
+type ConditionChannelChatMessage struct {
+	// BroadcasterUserID is the ID of the broadcaster to monitor.
+	BroadcasterUserID string `json:"broadcaster_user_id"`
+	// UserID User ID to read the chat as.
+	UserID string `json:"user_id"`
+
+}
 // ConditionStreamOnline represents the condition for a stream going online event.
 type ConditionStreamOnline struct {
 	// BroadcasterUserID is the ID of the broadcaster to monitor.
 	BroadcasterUserID string `json:"broadcaster_user_id"`
 }
+
 
 // EventStreamOnline subscribes to stream.online events for a broadcaster.
 func (c *Client) EventStreamOnline(ctx context.Context, sessionID string, condition ConditionStreamOnline) (*any, error) {
