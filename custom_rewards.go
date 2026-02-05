@@ -3,6 +3,7 @@ package twitchhelix
 import (
 	"context"
 	"fmt"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -148,11 +149,14 @@ type GlobalCooldownSetting struct {
 // The broadcaster must have channel points enabled.
 func (c *Client) CreateCustomReward(ctx context.Context, req RequestCustomReward, broadcasterID string) (*ResponseCustomReward, error) {
 	var resp ResponseCustomReward
-	query := fmt.Sprintf("channel_points/custom_rewards?broadcaster_id=%s", broadcasterID)
+
+	query := "channel_points/custom_rewards?broadcaster_id=" + broadcasterID
+
 	err := c.doRequest(ctx, "POST", query, req, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }
 
@@ -160,11 +164,14 @@ func (c *Client) CreateCustomReward(ctx context.Context, req RequestCustomReward
 // Only the fields provided in the request will be updated.
 func (c *Client) UpdateCustomReward(ctx context.Context, req RequestCustomReward, broadcasterID, rewardID string) (*ResponseCustomReward, error) {
 	var resp ResponseCustomReward
+
 	query := fmt.Sprintf("channel_points/custom_rewards?broadcaster_id=%s&id=%s", broadcasterID, rewardID)
+
 	err := c.doRequest(ctx, "PATCH", query, req, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }
 
@@ -177,21 +184,25 @@ type RequestGetCustomRewards struct {
 	RewardID []string `url:"id,omitempty"`
 
 	// OnlyManagableRewards determines whether only manageable rewards are returned.
-	OnlyManagableRewards bool `url:"only_managable_rewards"`
+	OnlyManagableRewards bool `url:"only_manageable_rewards"`
 }
 
 // GetCustomRewards retrieves a list of custom channel point rewards.
 // If reward IDs are provided, only those rewards will be returned.
 func (c *Client) GetCustomRewards(ctx context.Context, req RequestGetCustomRewards) (*ResponseCustomReward, error) {
 	var resp ResponseCustomReward
+
 	values, err := query.Values(req)
 	if err != nil {
 		return nil, err
 	}
-	query := fmt.Sprintf("channel_points/custom_rewards?%s", values.Encode())
+
+	query := "channel_points/custom_rewards?" + values.Encode()
+
 	err = c.doRequest(ctx, "GET", query, nil, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }

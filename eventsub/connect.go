@@ -2,11 +2,11 @@ package twitcheventsub
 
 import (
 	"encoding/json"
-	"log"
-	"net/url"
+	"fmt"
 	"sync"
 
 	"github.com/gorilla/websocket"
+	"go.uber.org/zap"
 )
 
 // SessionConfig represents the basic information to establish a connection
@@ -19,9 +19,11 @@ type SessionConfig struct {
 
 	// mu represents a RWMutex to pretect session data
 	mu sync.RWMutex
+
+	logger *zap.Logger
 }
 
-// Event represents the information of a recieved event
+// Event represents the information of a received event
 type Event struct {
 	// MessageType represents the type of message
 	// Welcome, Keepalive, Notification, Reconnect, Revocation
@@ -34,27 +36,32 @@ type Event struct {
 	Data []byte
 }
 
+// TwitchEventSubURL is the default URL for the websocket server where twitch hosts EventSub
+var TwitchEventSubURL = "wss://eventsub.wss.twitch.tv/ws"
+
 // NewEventSubWebsocket is a init function for session config
 func NewEventSubWebsocket(eventMessageChan chan<- Event) *SessionConfig {
-	// Twitch EventSub WebSocket endpoint
-	u := url.URL{Scheme: "wss", Host: "eventsub.wss.twitch.tv", Path: "/ws"}
-	urlString := u.String()
 	s := &SessionConfig{
 		Events: eventMessageChan,
 		Session: &Session{
-			ReconnectURL: &urlString,
+			ReconnectURL: &TwitchEventSubURL,
 		},
+		logger: zap.L(),
 	}
+
 	return s
 }
 
+func (s *SessionConfig) SetLogger(logger *zap.Logger) {
+	s.logger = logger
+}
+
 // Connect opens a connection to Twitch Event Sub
-func (s *SessionConfig) Connect() {
+func (s *SessionConfig) Connect() error {
 	// Dial the Twitch WebSocket
-	log.Printf("Connecting to %s", *s.Session.ReconnectURL)
 	c, _, err := websocket.DefaultDialer.Dial(*s.Session.ReconnectURL, nil)
 	if err != nil {
-		log.Fatal("dial:", err)
+		return fmt.Errorf("twitch-helix dial websocket: %w", err)
 	}
 	defer c.Close()
 
@@ -63,76 +70,102 @@ func (s *SessionConfig) Connect() {
 		websocketMessageType, message, err := c.ReadMessage()
 		if err != nil {
 			if websocketMessageType == websocket.PingMessage {
-				log.Println("Websocket PING IN ERROR BLOCK")
+				s.logger.Debug("Websocket PING, but read message has error", zap.Error(err))
 				c.WriteMessage(websocket.PongMessage, nil)
+
 				continue
 			}
-			log.Println("Read Error:", err)
-			return
+
+			s.logger.Error("Read Error:", zap.Error(err))
+
+			return nil
 		}
 
 		if websocketMessageType == websocket.PingMessage {
-			log.Println("Websocket PING")
+			s.logger.Debug("Websocket PING")
 			c.WriteMessage(websocket.PongMessage, nil)
+
 			continue
 		}
 
-		// parsing the data as a map
-		var raw map[string]any
-		err = json.Unmarshal(message, &raw)
+		var msg WebsocketMessage
+
+		err = json.Unmarshal(message, &msg)
 		if err != nil {
-			log.Println("error:", err)
-		}
-		metadataMap, ok := raw["metadata"].(map[string]any)
-		if !ok {
-			log.Println("Error reading message_type")
-			return
+			s.logger.Warn("twitch-helix decode message", zap.Error(err))
+
+			continue
 		}
 
+		logger := s.logger.With(zap.String("message_id", msg.Metadata.MessageID))
+
 		// Handle the different message types
-		switch metadataMap["message_type"] {
+		switch msg.Metadata.MessageType {
 		case "session_welcome":
 			var parsedMessage WelcomeMessage
+
 			err := json.Unmarshal(message, &parsedMessage)
 			if err != nil {
-				log.Println("Welcome Message Decoding Error: ", err)
-				return
+				logger.Error("decode session_welcome essage", zap.Error(err))
+
+				continue
 			}
+
 			s.mu.Lock()
 			s.Session = &parsedMessage.Payload.Session
 			s.mu.Unlock()
+
 			s.Events <- Event{MessageType: parsedMessage.Metadata.MessageType, SubscriptionType: parsedMessage.Metadata.SubscriptionType, Data: message}
 
 		case "session_keepalive":
 			var parsedMessage KeepaliveMessage
+
 			err := json.Unmarshal(message, &parsedMessage)
 			if err != nil {
-				log.Println("Keep Alive Message Decoding Error: ", err)
-				return
+				logger.Error("decode session_eepalive message", zap.Error(err))
+
+				continue
 			}
+
 			s.Events <- Event{MessageType: parsedMessage.Metadata.MessageType, SubscriptionType: parsedMessage.Metadata.SubscriptionType, Data: message}
 
 		case "notification":
 			var parsedMessage NotificationMessage
+
 			err := json.Unmarshal(message, &parsedMessage)
 			if err != nil {
-				log.Println("Notification Message Decoding Error: ", err)
-				return
+				logger.Error("decode notification message", zap.Error(err))
+
+				continue
 			}
+
 			s.Events <- Event{MessageType: parsedMessage.Metadata.MessageType, SubscriptionType: parsedMessage.Metadata.SubscriptionType, Data: message}
 
 		case "reconnect_message":
 			var parsedMessage ReconnectMessage
+
 			err := json.Unmarshal(message, &parsedMessage)
 			if err != nil {
-				log.Println("Reconnect Message Decoding Error: ", err)
-				return
+				logger.Error("decode reconnect_message message", zap.Error(err))
+
+				continue
 			}
+
 			s.mu.Lock()
+			logger.Info("reconnect url updated", zap.Stringp("new_url", parsedMessage.Payload.Session.ReconnectURL))
 			s.Session.ReconnectURL = parsedMessage.Payload.Session.ReconnectURL
 			s.mu.Unlock()
-			s.Connect()
 
+			if err := c.Close(); err != nil {
+				logger.Error("failed to close connection afer twitch asked for reconnect", zap.Error(err))
+			}
+
+			if err := s.Connect(); err != nil {
+				logger.Error("failed to reconnect after twitch asked for reconnect", zap.Error(err))
+				close(s.Events)
+
+				return err
+			}
 		}
 	}
 }

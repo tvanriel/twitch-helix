@@ -1,0 +1,19 @@
+version: "2"
+linters:
+  default: all
+
+  disable:
+    - varnamelen
+    - exhaustruct
+  settings:
+    ireturn: 
+      allow:
+        - anon
+        - "error"
+    depguard:
+      rules:
+        main:
+          allow:
+            - $gostd
+            - go.uber.org/zap
+            - github.com/gorilla/websocket

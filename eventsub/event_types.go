@@ -1,6 +1,6 @@
 package twitcheventsub
 
-// Reward represents a channel points reward
+// Reward represents a channel points reward.
 type Reward struct {
 	// ID is the unique id of the reward
 	ID string `json:"id"`
@@ -15,7 +15,7 @@ type Reward struct {
 	Prompt string `json:"prompt"`
 }
 
-// ChannelPointsRedemptionEvent is triggered when a viewer redeems a reward
+// ChannelPointsRedemptionEvent is triggered when a viewer redeems a reward.
 type ChannelPointsRedemptionEvent struct {
 	// ID is the unique id for this redemption
 	ID string `json:"id"`
@@ -45,7 +45,7 @@ type ChannelPointsRedemptionEvent struct {
 	Reward Reward `json:"reward"`
 }
 
-// ChannelRaidEvent is triggered when a broadcaster raids another channel
+// ChannelRaidEvent is triggered when a broadcaster raids another channel.
 type ChannelRaidEvent struct {
 	// FromBroadcasterUserID is the ID of the raiding broadcaster
 	FromBroadcasterUserID string `json:"from_broadcaster_user_id"`
@@ -69,7 +69,7 @@ type ChannelRaidEvent struct {
 	Viewers int `json:"viewers"`
 }
 
-// AdBreakEvent is triggered when an ad break starts
+// AdBreakEvent is triggered when an ad break starts.
 type AdBreakEvent struct {
 	// DurationSeconds is the length of the ad in seconds
 	DurationSeconds int `json:"duration_seconds"`
@@ -99,7 +99,7 @@ type AdBreakEvent struct {
 	RequesterUserName string `json:"requester_user_name"`
 }
 
-// StreamOnlineEvent is triggered when a broadcaster goes live
+// StreamOnlineEvent is triggered when a broadcaster goes live.
 type StreamOnlineEvent struct {
 	// ID is the unique id of the stream
 	ID string `json:"id"`
@@ -120,7 +120,7 @@ type StreamOnlineEvent struct {
 	StartedAt string `json:"started_at"`
 }
 
-// StreamOfflineEvent is triggered when a broadcaster goes offline
+// StreamOfflineEvent is triggered when a broadcaster goes offline.
 type StreamOfflineEvent struct {
 	// BroadcasterUserID is the broadcaster going offline
 	BroadcasterUserID string `json:"broadcaster_user_id"`
@@ -132,7 +132,7 @@ type StreamOfflineEvent struct {
 	BroadcasterUserName string `json:"broadcaster_user_name"`
 }
 
-// ChannelUpdateEvent is triggered when a broadcaster updates their channel information
+// ChannelUpdateEvent is triggered when a broadcaster updates their channel information.
 type ChannelUpdateEvent struct {
 	// BroadcasterUserID is the ID of the broadcaster
 	BroadcasterUserID string `json:"broadcaster_user_id"`
@@ -156,7 +156,7 @@ type ChannelUpdateEvent struct {
 	ContentClassificationLables []string `json:"content_classification_labels"`
 }
 
-// ChannelSubscriptionGiftEvent is triggered when a user gifts a subscription
+// ChannelSubscriptionGiftEvent is triggered when a user gifts a subscription.
 type ChannelSubscriptionGiftEvent struct {
 	// UserID is the ID of the user redeeming the reward
 	UserID string `json:"user_id"`

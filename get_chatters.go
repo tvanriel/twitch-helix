@@ -2,7 +2,6 @@ package twitchhelix
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/google/go-querystring/query"
 )
@@ -41,7 +40,7 @@ type ChattersResponse struct {
 	Total int `json:"total"`
 }
 
-// Chatter represents basic user information
+// Chatter represents basic user information.
 type Chatter struct {
 	// UserID represents the id of the user
 	UserID string `json:"user_id"`
@@ -56,16 +55,19 @@ type Chatter struct {
 // GetChatters gets the users connected to twitch's IRC chat client.
 func (c *Client) GetChatters(ctx context.Context, req ChattersRequest) (*ChattersResponse, error) {
 	var resp ChattersResponse
+
 	values, err := query.Values(req)
 	if err != nil {
 		return nil, err
 	}
 	// Example Request URL:
 	// https://api.twitch.tv/helix/chat.chatters?broadcaster_id=141981764
-	query := fmt.Sprintf("chat/chatters?%s", values.Encode())
+	query := "chat/chatters?" + values.Encode()
+
 	err = c.doRequest(ctx, "GET", query, nil, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }

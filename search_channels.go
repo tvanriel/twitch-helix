@@ -2,7 +2,7 @@ package twitchhelix
 
 import (
 	"context"
-	"fmt"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -84,14 +84,18 @@ type Channel struct {
 // Results can be filtered to include only live channels.
 func (c *Client) SearchChannels(ctx context.Context, req RequestSearchChannels) (*ResponseSearchChannels, error) {
 	var resp ResponseSearchChannels
+
 	values, err := query.Values(req)
 	if err != nil {
 		return nil, err
 	}
-	endpoint := fmt.Sprintf("search/channels?%s", values.Encode())
+
+	endpoint := "search/channels?" + values.Encode()
+
 	err = c.doRequest(ctx, "GET", endpoint, nil, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }

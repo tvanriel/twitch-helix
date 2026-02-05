@@ -2,7 +2,7 @@ package twitchhelix
 
 import (
 	"context"
-	"fmt"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -72,14 +72,18 @@ type User struct {
 // Users can be looked up by ID, login name, or both.
 func (c *Client) GetUsers(ctx context.Context, req GetUsersRequest) (*GetUsersResponse, error) {
 	var resp GetUsersResponse
+
 	values, err := query.Values(req)
 	if err != nil {
 		return nil, err
 	}
-	query := fmt.Sprintf("users?%s", values.Encode())
+
+	query := "users?" + values.Encode()
+
 	err = c.doRequest(ctx, "GET", query, nil, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }

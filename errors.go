@@ -18,6 +18,4 @@ func (e *TwitchAPIError) Error() string {
 	return fmt.Sprintf("Twitch API Error(%d): %s", e.StatusCode, e.Body)
 }
 
-var (
-	AuthErr = errors.New("Auth Error")
-)
+var AuthErr = errors.New("Auth Error")

@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-// SendMessageRequest represents the data needed to send a message to a channel
+// SendMessageRequest represents the data needed to send a message to a channel.
 type SendMessageRequest struct {
 	// BroadcasterID represents the ID of the broadcaster whose chat you are sending a message to.
 	BroadcasterID string `json:"broadcaster_id"`
@@ -26,7 +26,7 @@ type SendMessageRequest struct {
 	ForSourceOnly *bool `json:"for_source_only"`
 }
 
-// SendMessageResponse represents the data recieved from the server when sending a message.
+// SendMessageResponse represents the data received from the server when sending a message.
 type SendMessageResponse struct {
 	// MessageID represents the id of the message sent.
 	MessageID string `json:"message_id"`
@@ -40,7 +40,7 @@ type SendMessageResponse struct {
 	DropReason *DropReason `json:"drop_reason,omitempty"`
 }
 
-// DropReason represents the information for why a message was dropped
+// DropReason represents the information for why a message was dropped.
 type DropReason struct {
 	// Code is the error code for a message being dropped.
 	Code string `json:"code"`
@@ -52,9 +52,11 @@ type DropReason struct {
 // SendMessage sends a message to a specified twitch channel.
 func (c *Client) SendMessage(ctx context.Context, req SendMessageRequest) (*SendMessageResponse, error) {
 	var resp SendMessageResponse
+
 	err := c.doRequest(ctx, "POST", "chat/messages", req, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }

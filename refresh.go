@@ -33,7 +33,7 @@ func (c *Client) Refresh(clientSecret, refreshToken string) (*NewToken, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, "POST", twitchRefreshLink, strings.NewReader(tokenRequestData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, twitchRefreshLink, strings.NewReader(tokenRequestData))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new http request: %w", err)
 	}
@@ -41,10 +41,12 @@ func (c *Client) Refresh(clientSecret, refreshToken string) (*NewToken, error) {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	client := http.Client{}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
+
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
@@ -53,6 +55,7 @@ func (c *Client) Refresh(clientSecret, refreshToken string) (*NewToken, error) {
 	}
 
 	var tokenData NewToken
+
 	err = json.Unmarshal(body, &tokenData)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
@@ -80,7 +83,7 @@ func (c *Client) RefreshApp(clientSecret string) (*NewAppToken, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, "POST", twitchRefreshLink, strings.NewReader(tokenRequestData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, twitchRefreshLink, strings.NewReader(tokenRequestData))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new http request: %w", err)
 	}
@@ -88,10 +91,12 @@ func (c *Client) RefreshApp(clientSecret string) (*NewAppToken, error) {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	client := http.Client{}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
+
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
@@ -100,6 +105,7 @@ func (c *Client) RefreshApp(clientSecret string) (*NewAppToken, error) {
 	}
 
 	var tokenData NewAppToken
+
 	err = json.Unmarshal(body, &tokenData)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)

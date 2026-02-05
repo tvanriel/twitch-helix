@@ -2,7 +2,6 @@ package twitchhelix
 
 import (
 	"context"
-	"fmt"
 )
 
 // RequestModifyChannelInformation represents the fields that can be updated for a channel.
@@ -47,10 +46,12 @@ type ContentClassificationLabel struct {
 // At least one field in RequestModifyChannelInformation must be included.
 // Requires broadcaster authentication.
 func (c *Client) ModifyChannelInformation(ctx context.Context, req RequestModifyChannelInformation, broadcasterID string) error {
-	query := fmt.Sprintf("channels?broadcaster_id=%s", broadcasterID)
+	query := "channels?broadcaster_id=" + broadcasterID
+
 	err := c.doRequest(ctx, "PATCH", query, req, nil)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

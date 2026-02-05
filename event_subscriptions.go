@@ -43,21 +43,23 @@ type WebsocketTransport struct {
 
 func (c *Client) ChannelChatMessage(ctx context.Context, sessionID string, condition ConditionChannelChatMessage) (*any, error) {
 	req := EventRequest{
-		Type: "channel.chat.message",
-		Version: "1",
+		Type:      "channel.chat.message",
+		Version:   "1",
 		Conditoin: c,
 		Transport: WebsocketTransport{
 			Method:    "websocket",
 			SessionID: sessionID,
 		},
-	}	
+	}
+
 	var resp any
+
 	err := c.doRequest(ctx, "POST", "eventsub/subscriptions", req, &resp)
 	if err != nil {
 		return nil, err
 	}
-	return &resp, nil
 
+	return &resp, nil
 }
 
 type ConditionChannelChatMessage struct {
@@ -65,14 +67,13 @@ type ConditionChannelChatMessage struct {
 	BroadcasterUserID string `json:"broadcaster_user_id"`
 	// UserID User ID to read the chat as.
 	UserID string `json:"user_id"`
-
 }
+
 // ConditionStreamOnline represents the condition for a stream going online event.
 type ConditionStreamOnline struct {
 	// BroadcasterUserID is the ID of the broadcaster to monitor.
 	BroadcasterUserID string `json:"broadcaster_user_id"`
 }
-
 
 // EventStreamOnline subscribes to stream.online events for a broadcaster.
 func (c *Client) EventStreamOnline(ctx context.Context, sessionID string, condition ConditionStreamOnline) (*any, error) {
@@ -85,11 +86,14 @@ func (c *Client) EventStreamOnline(ctx context.Context, sessionID string, condit
 			SessionID: sessionID,
 		},
 	}
+
 	var resp any
+
 	err := c.doRequest(ctx, "POST", "eventsub/subscriptions", req, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }
 
@@ -110,11 +114,14 @@ func (c *Client) EventStreamOffline(ctx context.Context, sessionID string, condi
 			SessionID: sessionID,
 		},
 	}
+
 	var resp any
+
 	err := c.doRequest(ctx, "POST", "eventsub/subscriptions", req, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }
 
@@ -135,11 +142,14 @@ func (c *Client) EventChannelUpdate(ctx context.Context, sessionID string, condi
 			SessionID: sessionID,
 		},
 	}
+
 	var resp any
+
 	err := c.doRequest(ctx, "POST", "eventsub/subscriptions", req, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }
 
@@ -165,11 +175,14 @@ func (c *Client) EventChannelRaid(ctx context.Context, sessionID string, conditi
 			SessionID: sessionID,
 		},
 	}
+
 	var resp any
+
 	err := c.doRequest(ctx, "POST", "eventsub/subscriptions", req, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }
 
@@ -190,11 +203,14 @@ func (c *Client) EventChannelPointsCustomRewardRedemptionAdd(ctx context.Context
 			SessionID: sessionID,
 		},
 	}
+
 	var resp any
+
 	err := c.doRequest(ctx, "POST", "eventsub/subscriptions", req, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }
 
@@ -215,11 +231,14 @@ func (c *Client) EventChannelAdBreakBegin(ctx context.Context, sessionID string,
 			SessionID: sessionID,
 		},
 	}
+
 	var resp any
+
 	err := c.doRequest(ctx, "POST", "eventsub/subscriptions", req, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }
 
@@ -240,10 +259,13 @@ func (c *Client) EventChannelSubscriptionGift(ctx context.Context, sessionID str
 			SessionID: sessionID,
 		},
 	}
+
 	var resp any
+
 	err := c.doRequest(ctx, "POST", "eventsub/subscriptions", req, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }

@@ -15,13 +15,15 @@ import (
 // endpoint is the API path without the base URL.
 // body is encoded as JSON and sent as the request body.
 // out is decoded from the JSON response body.
-func (c *Client) doRequest(ctx context.Context, method string, endpoint string, body interface{}, out interface{}) error {
+func (c *Client) doRequest(ctx context.Context, method string, endpoint string, body any, out any) error {
 	var bodyReader io.Reader
+
 	if body != nil {
 		jsonBody, err := json.Marshal(body)
 		if err != nil {
 			return err
 		}
+
 		bodyReader = bytes.NewReader(jsonBody)
 	}
 
@@ -45,6 +47,7 @@ func (c *Client) doRequest(ctx context.Context, method string, endpoint string, 
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		bodyBytes, _ := io.ReadAll(resp.Body)
+
 		return &TwitchAPIError{
 			StatusCode: resp.StatusCode,
 			Body:       bodyBytes,
@@ -58,5 +61,6 @@ func (c *Client) doRequest(ctx context.Context, method string, endpoint string, 
 	if out != nil {
 		return json.NewDecoder(resp.Body).Decode(out)
 	}
+
 	return nil
 }

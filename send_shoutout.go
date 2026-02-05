@@ -2,7 +2,7 @@ package twitchhelix
 
 import (
 	"context"
-	"fmt"
+
 	"github.com/google/go-querystring/query"
 )
 
@@ -22,16 +22,19 @@ type RequestSendShoutout struct {
 
 // SendShoutout sends a shoutout to a user in a channel.
 // You must be at least a moderator to perform this action.
-// A "/shoutout" can only be sent every 2 minutes. You will recieve an error if you query too soon.
+// A "/shoutout" can only be sent every 2 minutes. You will receive an error if you query too soon.
 func (c *Client) SendShoutout(ctx context.Context, req RequestSendShoutout) error {
 	values, err := query.Values(req)
 	if err != nil {
 		return err
 	}
-	endpoint := fmt.Sprintf("chat/shoutouts?%s", values.Encode())
+
+	endpoint := "chat/shoutouts?" + values.Encode()
+
 	err = c.doRequest(ctx, "POST", endpoint, nil, nil)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

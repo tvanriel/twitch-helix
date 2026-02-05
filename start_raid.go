@@ -15,9 +15,9 @@ type RequestStartRaid struct {
 	ToBroadcasterID string `json:"to_broadcaster_id"`
 }
 
-// ResponseStartRaid represents the data recieved from the server when starting a raid.
+// ResponseStartRaid represents the data received from the server when starting a raid.
 type ResponseStartRaid struct {
-	// StartRaidData represents the data recieved when starting a raid.
+	// StartRaidData represents the data received when starting a raid.
 	StartRaidData []StartRaidData `json:"data"`
 }
 
@@ -35,9 +35,11 @@ type StartRaidData struct {
 // StartRaid attempts to start a raid to another channel.
 func (c *Client) StartRaid(ctx context.Context, req RequestStartRaid) (*ResponseStartRaid, error) {
 	var resp ResponseStartRaid
+
 	err := c.doRequest(ctx, "POST", "raids", req, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }

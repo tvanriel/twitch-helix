@@ -2,7 +2,11 @@ package twitcheventsub
 
 import "time"
 
-// Metadata is common information shared by all EventSub messages
+type WebsocketMessage struct {
+	Metadata Metadata `json:"metadata"`
+}
+
+// Metadata is common information shared by all EventSub messages.
 type Metadata struct {
 	// MessageID is the unique id of the message
 	MessageID string `json:"message_id"`
@@ -20,7 +24,7 @@ type Metadata struct {
 	SubscriptionVersion string `json:"subscription_version,omitempty"`
 }
 
-// Session contains information about an EventSub session
+// Session contains information about an EventSub session.
 type Session struct {
 	// ID is the session's unique id
 	ID string `json:"id"`
@@ -38,7 +42,7 @@ type Session struct {
 	ConnectedAt time.Time `json:"connected_at"`
 }
 
-// Subscription contains details about an EventSub subscription
+// Subscription contains details about an EventSub subscription.
 type Subscription struct {
 	// ID is the subscription's unique id
 	ID string `json:"id"`
@@ -65,7 +69,7 @@ type Subscription struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-// Transport contains the delivery method of an EventSub subscription
+// Transport contains the delivery method of an EventSub subscription.
 type Transport struct {
 	// Method is the delivery method (websocket or webhook)
 	Method string `json:"method"`
@@ -76,7 +80,7 @@ type Transport struct {
 
 // ====================== MESSAGE TYPES ======================
 
-// WelcomeMessage is sent when a session is first created
+// WelcomeMessage is sent when a session is first created.
 type WelcomeMessage struct {
 	// Metadata contains common message information
 	Metadata Metadata `json:"metadata"`
@@ -88,7 +92,7 @@ type WelcomeMessage struct {
 	} `json:"payload"`
 }
 
-// KeepaliveMessage is sent periodically to keep the session alive
+// KeepaliveMessage is sent periodically to keep the session alive.
 type KeepaliveMessage struct {
 	// Metadata contains common message information
 	Metadata Metadata `json:"metadata"`
@@ -97,7 +101,7 @@ type KeepaliveMessage struct {
 	Payload struct{} `json:"payload"`
 }
 
-// NotificationMessage is sent when a subscription event occurs
+// NotificationMessage is sent when a subscription event occurs.
 type NotificationMessage struct {
 	// Metadata contains common message information
 	Metadata Metadata `json:"metadata"`
@@ -112,7 +116,7 @@ type NotificationMessage struct {
 	} `json:"payload"`
 }
 
-// ReconnectMessage is sent when the session should reconnect
+// ReconnectMessage is sent when the session should reconnect.
 type ReconnectMessage struct {
 	// Metadata contains common message information
 	Metadata Metadata `json:"metadata"`
@@ -124,7 +128,7 @@ type ReconnectMessage struct {
 	} `json:"payload"`
 }
 
-// RevocationMessage is sent when a subscription is revoked
+// RevocationMessage is sent when a subscription is revoked.
 type RevocationMessage struct {
 	// Metadata contains common message information
 	Metadata Metadata `json:"metadata"`

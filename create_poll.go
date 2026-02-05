@@ -73,9 +73,11 @@ type Choice struct {
 // Optionally, viewers can vote using channel points. The poll will run for the specified duration.
 func (c *Client) CreatePoll(ctx context.Context, req RequestCreatePoll) (*ResponseCreatePoll, error) {
 	var resp ResponseCreatePoll
+
 	err := c.doRequest(ctx, "POST", "polls", req, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }

@@ -2,7 +2,6 @@ package twitchhelix
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/google/go-querystring/query"
 )
@@ -12,38 +11,38 @@ type StreamRequest struct {
 	// UserID filters streams by broadcaster user IDs.
 	//
 	// You may specify up to 100 user IDs.
-	UserID []*string `url:"user_id,omitempty" json:"user_id,omitempty"`
+	UserID []*string `json:"user_id,omitempty" url:"user_id,omitempty"`
 
 	// UserLogin filters streams by broadcaster login names.
 	//
 	// You may specify up to 100 login names.
-	UserLogin []*string `url:"user_login,omitempty" json:"user_login,omitempty"`
+	UserLogin []*string `json:"user_login,omitempty" url:"user_login,omitempty"`
 
 	// GameID filters streams by game IDs.
 	//
 	// You may specify up to 100 game IDs.
-	GameID []*string `url:"game_id,omitempty" json:"game_id,omitempty"`
+	GameID []*string `json:"game_id,omitempty" url:"game_id,omitempty"`
 
 	// Type filters streams by stream type.
 	//
 	// Valid values are "all" or "live".
-	Type *string `url:"type,omitempty" json:"type,omitempty"`
+	Type *string `json:"type,omitempty" url:"type,omitempty"`
 
 	// Language filters streams by broadcast language.
 	//
 	// The value must be an ISO 639-1 language code.
-	Language []*string `url:"language,omitempty" json:"language,omitempty"`
+	Language []*string `json:"language,omitempty" url:"language,omitempty"`
 
 	// First specifies the maximum number of items to return.
 	//
 	// The value must be between 1 and 100.
-	First *int `url:"first,omitempty" json:"first,omitempty"`
+	First *int `json:"first,omitempty" url:"first,omitempty"`
 
 	// Before is the cursor used to fetch the previous page.
-	Before *string `url:"before,omitempty" json:"before,omitempty"`
+	Before *string `json:"before,omitempty" url:"before,omitempty"`
 
 	// After is the cursor used to fetch the next page.
-	After *string `url:"after,omitempty" json:"after,omitempty"`
+	After *string `json:"after,omitempty" url:"after,omitempty"`
 }
 
 // StreamResponse represents the response returned from the Get Streams endpoint.
@@ -115,14 +114,18 @@ type StreamData struct {
 // Results can be filtered using the provided query parameters.
 func (c *Client) GetStreams(ctx context.Context, req StreamRequest) (*StreamResponse, error) {
 	var resp StreamResponse
+
 	values, err := query.Values(req)
 	if err != nil {
 		return nil, err
 	}
-	query := fmt.Sprintf("streams?%s", values.Encode())
+
+	query := "streams?" + values.Encode()
+
 	err = c.doRequest(ctx, "GET", query, nil, &resp)
 	if err != nil {
 		return nil, err
 	}
+
 	return &resp, nil
 }
